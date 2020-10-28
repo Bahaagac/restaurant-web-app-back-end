@@ -21,7 +21,7 @@ dishRouter.route('/')
 
 .post((req,res,next) => {
     res.end('Will add the dish ' + req.body.name 
-    + 'with details: ' + req.body.discription)
+    + ' with details: ' + req.body.description)
 })
 
 .put((req,res,next) => {
@@ -47,7 +47,7 @@ dishRouter.route('/:dishId')
 })
 
 .put((req,res,next) => {
-    res.write('updating the dish: ' + req.params.dishId + '\n');
+    res.write('Updating the dish: ' + req.params.dishId + '\n');
     res.end('Will update the dish: ' + req.body.name + ' with details: ' + req.body.description)
 })
 
