@@ -8,20 +8,34 @@ const connect = mongoose.connect(url,{ useUnifiedTopology: true },{ useNewUrlPar
 connect.then((db) => {
     console.log("Connected correctly to server");
 
-    var newDish = Dishes({
+    Dishes.create({
         name: "Uthapizza",
         description: 'test'
-    });
-
-    newDish.save()
+        })    
         .then((dish) => {
             console.log(dish);
 
-            return Dishes.find({}).exec();
+            return Dishes.findByIdAndUpdate(dish._id,{
+                $set: {description : 'Updated test'}
+            },
+            {
+                new: true
+            }).exec();
         })
-        .then((dishes) => {
-            console.log(dishes);
+        .then((dish) => {
+            console.log(dish);
 
+            dish.comments.push({
+                rating:5,
+                comment: "Test comment",
+                author: 'Baha'
+            });
+            
+            return dish.save();
+        })
+        .then((dish) => {
+            console.log(dish);
+        
             return Dishes.remove({})
         })
         .then(() => {
