@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 
 const Dishes = require('../models/dishes');
 
@@ -52,7 +51,6 @@ dishRouter.route('/')
 // DishID
 dishRouter.route('/:dishId')
 
-
 .get((req,res,next)  => {
     Dishes.findById(req.params.dishId)
     .then((dish) => {
@@ -69,9 +67,9 @@ dishRouter.route('/:dishId')
 })
 
 .put((req,res,next) => {
-   Dishes.findByIdAndUpdate(req.params.dishId, {
-       $set : req.body
-   }, {new : true})
+   Dishes.findByIdAndUpdate(req.params.dishId, 
+    {$set : req.body},
+    {new : true})
    .then((dish) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
