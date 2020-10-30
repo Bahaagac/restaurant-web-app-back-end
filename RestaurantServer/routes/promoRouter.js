@@ -2,16 +2,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const authenticate = require('../authenticate');
 const Promotions = require('../models/promotions');
+const cors = require('./cors');
 
 const promoRouter = express.Router();
 
 promoRouter.use(bodyParser.json());
 
 promoRouter.route('/')
-
+.options(cors.corsWithOptions,(req,res) => {res.sendStatus(200); })
 
 //Promotions
-.get((req,res, next)  => {
+.get(cors.cors,(req,res, next)  => {
     Promotions.find({})
     .then((promotions) => {
         res.statusCode = 200;
@@ -21,7 +22,7 @@ promoRouter.route('/')
     .catch((err) => next(err));
 })
 
-.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     Promotions.create(req.body)
     .then((promotions) => {
         res.statusCode =200;
@@ -31,12 +32,12 @@ promoRouter.route('/')
     .catch((err) => next(err));
 })
 
-.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     res.statusCode = 403;
     res.end('PUT operation not supperted on /promotions')
 })
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)  => {
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)  => {
     Promotions.remove({})
     .then((promotions) => {
         res.statusCode = 200;
@@ -48,9 +49,9 @@ promoRouter.route('/')
 
 // PromoId
 promoRouter.route('/:promoId')
+.options(cors.corsWithOptions,(req,res) => {res.sendStatus(200); })
 
-
-.get((req,res,next)  => {
+.get(cors.cors,(req,res,next)  => {
     Promotions.findById(req.params.promoId)
     .then((promotion) => {
     res.statusCode=200;
@@ -60,12 +61,12 @@ promoRouter.route('/:promoId')
     .catch((err) => next(err));
 })
 
-.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     res.statusCode = 403;
     res.end('post operation not supperted on /promo/' + req.params.promoId)
 })
 
-.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     Promotions.findByIdAndUpdate(req.params.promoId,
         {$set : req.body},
         {new : true})
@@ -77,7 +78,7 @@ promoRouter.route('/:promoId')
         .catch((err) =>next(err));
 })
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)  => {
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)  => {
     Promotions.findByIdAndRemove(req.params.promoId)
     .then((resp) => {
         res.statusCode=200;
