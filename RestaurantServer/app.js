@@ -37,7 +37,9 @@ app.use(express.urlencoded({ extended: false }));
 
 
 
+app.use(session({ secret: 'anything' }));
 app.use(passport.initialize());
+app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

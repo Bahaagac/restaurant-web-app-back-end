@@ -10,9 +10,16 @@ router.use(bodyParser.json());
 
 
 /* GET users listing. */
-router.get('/', (req, res, next) => {
-  res.send('respond with a resource');
-});
+router.get(('/'),authenticate.verifyUser,authenticate.verifyAdmin, (req,res,next) => {
+  console.log(req.user)
+  User.find({})
+  .then((users) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(users);
+  }, (err) => next(err))
+  .catch((err) => next(err));
+})
 
 
 router.post('/signup', (req, res, next) => {
@@ -46,7 +53,6 @@ router.post('/signup', (req, res, next) => {
 });
   
 router.post('/login',passport.authenticate('local'),(req,res) => {
-
     const token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
     res.setHeader('Content-Type','application/json');
@@ -65,4 +71,7 @@ router.get('/logout', (req, res,next) => {
     next(err);
   }
 });
+
+
+
 module.exports = router;
