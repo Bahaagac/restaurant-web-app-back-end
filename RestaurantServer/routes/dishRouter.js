@@ -206,7 +206,6 @@ dishRouter.route('/:dishId/comments/:commentId')
 })
 
 .put(cors.corsWithOptions,authenticate.verifyUser, (req, res, next) => {
-    console.log(req.user._id)
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null && dish.comments.id(req.params.commentId) != null) {

@@ -10,7 +10,6 @@ var router = express.Router();
 router.use(bodyParser.json());
 
 
-/* GET users listing. */
 router.get(('/'),cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req,res,next) => {
   console.log(req.user)
   User.find({})
