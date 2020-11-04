@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const authenticate = require('../authenticate');
-const Comment = require('../models/comments');
-const cors = require('./cors');
+const Comments = require('../models/comments');
 
 const commentRouter = express.Router();
 
@@ -12,9 +11,8 @@ commentRouter.use(bodyParser.json());
 
 //Comments
 commentRouter.route('/')
-.options(cors.corsWithOptions,(req,res) => {res.sendStatus(200); })
 
-.get(cors.cors,(req,res,next) => {
+.get((req,res,next) => {
     Comments.find(req.query)
     .populate('author')
     .then((comments) => {
@@ -24,7 +22,7 @@ commentRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(cors.corsWithOptions,authenticate.verifyUser, (req, res, next) => {
+.post(authenticate.verifyUser, (req, res, next) => {
     if(req.body != null) {
         req.body.author = req.user._id
         Comments.create(req.body)
@@ -37,22 +35,23 @@ commentRouter.route('/')
                     res.json(comment);
                 })
         
-        }, (err) => next(err))
+        }, (err) =>next(err))
         .catch((err) => next(err));
     }
     else {
         err = new Error('Comment not found in request body');
         err.status = 404;
+        console.log(err,"deneme2");
         return next(err);
     }
     
 })
 
-.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /comments');
 })
-.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
     Comments.remove({})
     .then((resp) => {
         res.statusCode = 200;
@@ -63,11 +62,11 @@ commentRouter.route('/')
 });
 
 
-//dishId/comments/commendId
+// comments/commendId
 commentRouter.route('/:commentId')
-.options(cors.corsWithOptions,(req,res) => {res.sendStatus(200); })
+.options((req,res) => {res.sendStatus(200); })
 
-.get(cors.cors,(req,res,next) => {
+.get((req,res,next) => {
     console.log(req.user)
 
     Comments.findById(req.params.commentId)
@@ -81,12 +80,12 @@ commentRouter.route('/:commentId')
     .catch((err) => next(err));
 })
 
-.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
     res.statusCode = 403;
     res.end('POST operation not supported on /commments/'+ req.params.commentId);
 })
 
-.put(cors.corsWithOptions,authenticate.verifyUser, (req, res, next) => {
+.put(authenticate.verifyUser, (req, res, next) => {
     Comments.findById(req.params.commentId)
     .then((comment) => {
         if (comment != null) {
@@ -119,11 +118,11 @@ commentRouter.route('/:commentId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete(cors.corsWithOptions,authenticate.verifyUser,  (req, res, next) => {
+.delete(authenticate.verifyUser,  (req, res, next) => {
     Comments.findById(req.params.commentId)
     .then((comment) => {
         if (comment != null) {
-            if(comments.author.equals(req.user._id)) {
+            if(comment.author.equals(req.user._id)) {
                 Comments.findByIdAndRemove(req.params.commentId)
                 .then((resp ) => {                   
                         res.statusCode = 200;

@@ -3,15 +3,13 @@ const bodyParser = require('body-parser');
 const User = require('../models/user');
 const passport = require('passport');
 const authenticate  = require('../authenticate');
-const cors = require('./cors');
 
 
 var router = express.Router();
 router.use(bodyParser.json());
 
-router.options('*',cors.corsWithOptions, (req,res) => {res.sendStatusCode =200;})
 
-router.get(('/'),cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req,res,next) => {
+router.get(('/'),authenticate.verifyUser,authenticate.verifyAdmin, (req,res,next) => {
   console.log(req.user)
   User.find({})
   .then((users) => {
@@ -23,13 +21,13 @@ router.get(('/'),cors.corsWithOptions,authenticate.verifyUser,authenticate.verif
 })
 
 
-router.post('/signup',cors.corsWithOptions ,(req, res, next) => {
+router.post('/signup',(req, res, next) => {
   User.register(new User({username: req.body.username}), 
     req.body.password, (err, user) => {
     if(err) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      res.json({err: err});
+      res.json(err);
     }
     else {
       if (req.body.firstname)
@@ -40,7 +38,7 @@ router.post('/signup',cors.corsWithOptions ,(req, res, next) => {
         if (err) {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
-          res.json({err: err});
+          res.json(err);
           return ;
         }
         passport.authenticate('local')(req, res, () => {
@@ -53,7 +51,7 @@ router.post('/signup',cors.corsWithOptions ,(req, res, next) => {
   });
 });
   
-router.post('/login',cors.corsWithOptions,(req,res ,next ) => {
+router.post('/login',(req,res ,next ) => {
 
   passport.authenticate('local', (err,user,info) => {
     if(err) {
@@ -64,7 +62,9 @@ router.post('/login',cors.corsWithOptions,(req,res ,next ) => {
       res.setHeader('Content-Type','application/json');
       res.json({success: false,status: 'Login Unsuccesful',err:info}); 
     }
-    req.logIn(user, (err)=> {
+    else
+    {
+      req.logIn(user, (err)=> {
       if(err) {
         res.statusCode = 401;
         res.setHeader('Content-Type','application/json');
@@ -74,12 +74,12 @@ router.post('/login',cors.corsWithOptions,(req,res ,next ) => {
       res.statusCode = 200;
       res.setHeader('Content-Type','application/json');
       res.json({success: true, token: token,status: 'Login Succesful', token : token});  
-      });
+      })}
     }) (req,res,next);
      
 })
 
-router.get('/logout', cors.corsWithOptions, (req, res,next) => {
+router.get('/logout', (req, res,next) => {
   if (req.session) {
     req.session.destroy();
     res.clearCookie('session-id');
@@ -101,7 +101,7 @@ router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res
   }
 });
 
-router.get('/checkJWTToken', cors.corsWithOptions,(req,res) => {
+router.get('/checkJWTToken',(req,res) => {
   passport.authenticate('jwt',{session : false}, (err,user,info) => {
     if(err) {
       return next(err);

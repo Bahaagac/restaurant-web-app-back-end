@@ -8,6 +8,9 @@ const passport = require('passport');
 const authenticate = require('./authenticate');
 const config = require('./config');
 
+var cors = require('cors');
+
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const dishRouter = require('./routes/dishRouter');
@@ -17,6 +20,7 @@ const uploadRouter = require('./routes/uploadRouter');
 const favoriteRouter = require('./routes/favoriteRouter');
 const commentRouter = require('./routes/commentRouter')
 const mongoose = require('mongoose');
+const feedbackRouter = require('./routes/feedbackRouter');
 
 
 const url = config.mongoUrl;
@@ -28,6 +32,7 @@ connect.then((db) => {
 
 
 var app = express();
+app.use(cors())
 
 // view engine setupcd
 app.set('views', path.join(__dirname, 'views'));
@@ -49,7 +54,6 @@ app.use('/users', usersRouter);
 //Authentication
 
 
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -59,6 +63,7 @@ app.use('/leaders',leaderRouter);
 app.use('/imageUpload',uploadRouter);
 app.use('/favorites', favoriteRouter);
 app.use('/comments',commentRouter);
+app.use('/feedback', feedbackRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
